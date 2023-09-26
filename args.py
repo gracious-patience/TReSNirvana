@@ -33,7 +33,9 @@ def Configs():
     parser.add_argument('--patch_size', dest='patch_size', type=int, default=224, 
                         help='Crop size for training & testing image patches')
     parser.add_argument('--droplr', dest='droplr', type=int, default=5, 
-                        help='drop lr by every x iteration')   
+                        help='drop lr by every x iteration')
+    parser.add_argument('--lrratio', dest='lrratio', type=float, default=1, 
+                        help='Constant to decrease lr')
     parser.add_argument('--gpunum', dest='gpunum', type=str, default='0',
                         help='the id for the gpu that will be used')
     parser.add_argument('--network', dest='network', type=str, default='resnet50',
@@ -48,6 +50,8 @@ def Configs():
                         help='path to resnet50 default weights')
     parser.add_argument('--stateSnapshot', dest='stateSnapshot', type=str, 
                         help='path to checkpoint if resumed')
+    parser.add_argument('--scheduler', dest='scheduler', type=str, 
+                        help='scheduler')
     parser.add_argument('--resume', dest='resume', type=int, default=0,
                         help='resume or not')
     
