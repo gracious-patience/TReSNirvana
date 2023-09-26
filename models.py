@@ -190,6 +190,15 @@ class TReS(object):
 		# self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay, betas=(1-self.k*(1-0.9), 1-self.k*(1-0.999)))
 		self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay)
 
+		if config.resume:
+			checkpoint = torch.load(self.stateSnapshot + '/model_{}_{}'.format(str(config.vesion),str(config.seed)), map_location=device)
+			self.net.load_state_dict(checkpoint['model_state_dict'])
+			self.solver.load_state_dict(checkpoint['optimizer_state_dict'])
+			self.loss = checkpoint['loss']
+			self.start_epoch = checkpoint['epoch']
+		else:
+			self.start_epoch = 0
+
 
 		train_loader = data_loader.DataLoader(config.dataset, datapath, 
 											  train_idx, config.patch_size, 
@@ -215,12 +224,14 @@ class TReS(object):
 		results = {}
 		performPath = svPath +'/' + 'val_SRCC_PLCC_'+str(self.config.vesion)+'_'+str(seed)+'.json'
 		trainPerformPath = svPath +'/' + 'train_LOSS_SRCC_'+str(self.config.vesion)+'_'+str(seed)+'.json'
-		with open(performPath, 'w') as json_file2:
-			json.dump(  {} , json_file2)
-		with open(trainPerformPath, 'w') as json_file3:
-			json.dump( {}, json_file3 )
+
+		if not self.resume:
+			with open(performPath, 'w') as json_file2:
+				json.dump(  {} , json_file2)
+			with open(trainPerformPath, 'w') as json_file3:
+				json.dump( {}, json_file3 )
 		
-		for epochnum in range(self.epochs):
+		for epochnum in range(self.start_epoch, self.epochs):
 			self.net.train()
 			epoch_loss = []
 			pred_scores = []
@@ -338,6 +349,14 @@ class TReS(object):
 
 				# self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay, betas=(1-self.k*(1-0.9), 1-self.k*(1-0.999)))
 				self.solver = torch.optim.Adam(self.paras, weight_decay=self.weight_decay)
+
+			fullModelPath = self.stateSnapshot + '/model_{}_{}'.format(str(self.config.vesion),str(self.config.seed),epochnum)
+			torch.save({
+				'epoch': epochnum,
+				'model_state_dict': self.net.state_dict(),
+				'optimizer_state_dict': self.solver.state_dict(),
+				'loss': loss,
+            }, fullModelPath)
 
 		print('Best val SRCC %f, PLCC %f' % (best_srcc, best_plcc))
 
