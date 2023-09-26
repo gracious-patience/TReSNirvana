@@ -48,7 +48,7 @@ def Configs():
                         help='dim feedforward in the transformer')
     parser.add_argument('--resnet_path', dest='resnet_path', type=str, 
                         help='path to resnet50 default weights')
-    parser.add_argument('--stateSnapshot', dest='stateSnapshot', type=str, 
+    parser.add_argument('--stateSnapshot', dest='stateSnapshot', type=str, default="",
                         help='path to checkpoint if resumed')
     parser.add_argument('--scheduler', dest='scheduler', type=str, 
                         help='scheduler')
